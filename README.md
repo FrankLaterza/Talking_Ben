@@ -2,7 +2,7 @@
 
 A very unoptimized discord V13 bot that works like the talking ben app
 
-## How to use
+### How to use
 
 use ~ben to make ben join the server
 when not in a channel he will say ben?
