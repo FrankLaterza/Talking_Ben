@@ -1,4 +1,6 @@
-const {
+import { AnyChannel, Client, Message, VoiceChannel } from "discord.js";
+
+import {
   VoiceConnectionStatus,
   AudioPlayerStatus,
   createAudioPlayer,
@@ -6,11 +8,9 @@ const {
   createAudioResource,
   getVoiceConnections,
   SpeakingMap,
-  audioSSRC,
   entersState,
-  createListeningStream,
   VoiceReceiver,
-} = require("@discordjs/voice");
+} from "@discordjs/voice";
 
 const sound_files = [
   "./sounds/Uhg.mp3",
@@ -25,22 +25,24 @@ let timerFlag = 1;
 // grets a decimal number
 // const rand = Math.random() * sound_files.length;
 
+const errorHandling = (message: Message) => {
+  message.channel.send("ben?");
+  return;
+}
+
 module.exports = {
   name: "ben",
   description: "this is a template",
   cooldown: 10,
   args: false,
 
-  async execute(message, args, client) {
+  async execute(message: Message, args: any[], client: Client) {
     //get the voice channel ids
-    if (message.member.voice.channelId === null) {
-      message.channel.send("ben?");
-      return 0;
-    }
-
-    const voiceChannelId = message.member.voice.channelId;
+    const voiceChannelId = message.member?.voice.channelId;
+    if (!voiceChannelId) return errorHandling(message);
     const voiceChannel = client.channels.cache.get(voiceChannelId);
-    const guildId = message.guild.id;
+    const guildId = message.guild?.id;
+    if (!guildId || voiceChannel?.type !== 'GUILD_VOICE') return errorHandling(message);
 
     //create audio playerz
     const player = createAudioPlayer();

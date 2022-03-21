@@ -16,5 +16,8 @@
     "fs": "^0.0.1-security",
     "libsodium-wrappers": "^0.7.9"
   },
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "typescript": "^4.6.2"
+  }
 }
