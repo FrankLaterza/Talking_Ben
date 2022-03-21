@@ -1,7 +1,8 @@
 // require the discord.js module
-const fs = require("fs");
-const { Client, Collection, Intents, Discord } = require("discord.js");
-const client = new Client({
+import fs from 'fs';
+import { Client, Collection, Intents, Message } from 'discord.js';
+import { CommandsData } from './shared';
+const client: Client<boolean> & {commands?: Collection<string, CommandsData>} = new Client({
   intents: [
     Intents.FLAGS.GUILDS,
     Intents.FLAGS.GUILD_MESSAGES,
@@ -25,7 +26,7 @@ client.commands = new Collection();
 
 const commandFiles = fs
   .readdirSync("./commands")
-  .filter((file) => file.endsWith(".js"));
+  .filter((file: string) => file.endsWith(".js"));
 
 for (const file of commandFiles) {
   const command = require(`./commands/${file}`);
@@ -45,18 +46,19 @@ client.once("ready", () => {
 client.login(process.env.TOKEN); // The token should be stored in your .env file
 
 // this will run when a message is sent in the server form visable channels
-client.on("message", (message) => {
+client.on("message", (message: Message<boolean>) => {
   console.log("udpate");
 
   // the the mesage doesn't start with the prefix or was sent by the bot or the id was on the blacklist then ommit request
   if (!message.content.startsWith(prefix) || message.author.bot) return;
 
   let args = message.content.slice(prefix.length).trim().split(/ +/); // gets  the arguments
-  const commandName = args.shift().toLowerCase(); // sets command name to all lowercase
+  const commandName = args.shift()?.toLowerCase(); // sets command name to all lowercase
+  if (!commandName) return;
   const command =
-    client.commands.get(commandName) || // command
-    client.commands.find(
-      (cmd) => cmd.aliases && cmd.aliases.includes(commandName)
+    client.commands?.get(commandName) || // command
+    client.commands?.find(
+      (cmd: CommandsData) => cmd.aliases && cmd.aliases.includes(commandName)
     );
 
   if (!commandName) {
@@ -77,7 +79,8 @@ client.on("message", (message) => {
     if (command.usage) {
       reply += `\nThe proper usage would be: \`${prefix}${command.name} ${command.usage}\``;
     }
-    return message.channel.send(reply);
+    message.channel.send(reply);
+    return;
   }
   console.log("command detected"); //shows a command was registed
 
